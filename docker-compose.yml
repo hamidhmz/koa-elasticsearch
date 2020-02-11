@@ -1,0 +1,35 @@
+version: "3.7"
+services:
+    app:
+        container_name: node-elasticsearch
+        restart: always
+        build: .
+        volumes:
+            - ./:/app
+        ports:
+            - "8182:3000"
+        environment:
+            - "NODE_ENV=docker"
+            - "PORT=3000"
+        depends_on: ["elasticsearch"]
+    kibana:
+        image: docker.elastic.co/kibana/kibana:7.0.0
+        ports:
+            - 5601:5601
+        environment:
+            - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+        depends_on: ["elasticsearch"]
+    elasticsearch:
+        image: elasticsearch:7.5.2
+        container_name: elasticsearch
+        environment:
+            - discovery.type=single-node
+            - node.name=elasticsearch
+            - http.cors.enabled=true
+            - http.cors.allow-origin=*
+        # privileged: true
+        ports:
+            - 9200:9200
+            - 9300:9300
+volumes:
+    mongo-data-lexical:
